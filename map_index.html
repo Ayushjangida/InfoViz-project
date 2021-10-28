@@ -1,18 +1,50 @@
 <!doctype html>
 <html>
-<meta charset="utf-8">
 <head>
+	<meta charset="utf-8">
 	<meta name="description" content="">
-	<title>BC School Districts Map</title>
+	<title>Trial Maps - Adding maps using topojson</title>
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https:///d3js.org/topojson.v1.min.js"></script>
 
+
+
+    
 </head>
 <body class="body">
 
+	<div class="canva">
+    </div>
+	<div>
+		<label for="languages">Choose a language</label>
+		
+		<select name="languages" id="languages">
+			<option value="Punjabi">Punjabi</option>
+			<option value="Hindi">Hindi</option>
+			<option value="French">French</option>
+		</select>
+	</div>
+	<div>
+		<label for="level">Choose Level</label>
+
+		<select name="level" id="level">
+			<option value="DISTRICT LEVEL">District Level</option>
+			<option value="PROVINCE LEVEL">Province Level</option>
+		</select>
+	</div>
+	<div>
+		<label for="year">CHoose year</label>
+		
+		<select name="year" id="year">
+			<option value="2000/2001">1991/92</option>
+			<option value="1992/1993">1992/93</option>
+			<option value="1993/1994">1993/94</option>
+		</select>
+	</div>
+
+
 </body>
 
-<script type="text/javascript" src="map_main.js"></script>
-<link rel="stylesheet" href="style.css">
+<script src="map_main.js"></script>
 
 </html>

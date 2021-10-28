@@ -1,6 +1,5 @@
-
-
-//const topo_url = "https://gist.githubusercontent.com/Ayushjangida/c42b366cb33ed967f91f77efb5324bac/raw/8511944973445eb533c99c8e57aa99447d12fd59/student_district.json";
+const topo_url = "https://gist.githubusercontent.com/Ayushjangida/c42b366cb33ed967f91f77efb5324bac/raw/8511944973445eb533c99c8e57aa99447d12fd59/student_district.json";
+const student_url = "https://gist.githubusercontent.com/Ayushjangida/4f33a07e10bd6432dfd9bfa479467ce7/raw/2802462a0c054212c7dd985a566b12faf3222955/students.csv";
 
 // other resources used:
 // https://mapshaper.org/ - for simplyfying geojson file
@@ -20,10 +19,19 @@ var div = d3.select("body")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
-var svg = d3.select("body").append("svg")
+var mapDiv = d3.select("body")
+                .append("div")
+                .attr("widht", GRAPH_WIDTH)
+                .attr("height", GRAPH_HEIGHT);
+
+var form = d3.select("body").append("form");
+
+
+var svg = mapDiv.append("svg")
     .attr("width", GRAPH_WIDTH)
     .attr("height", GRAPH_HEIGHT)
     .attr("id", "map");
+
 
 function handleMouseOver(position) {
     let pos = d3.mouse(this);
@@ -45,11 +53,72 @@ function handleMouseOut() {
         .transition().duration(500)
         .style("opacity", 0);
 }
-d3.csv("students.csv").then(studentData => {
+
+function selectLanguage()    {
+    var select = document.getElementById("languages");
+    var value = select.options[select.selectedIndex].value;
+    console.log(value);
+}
+
+
+
+
+d3.csv(student_url).then(studentData => {
     console.log(studentData);
 
-    d3.json("districts1.json").then(data => {
+    var select = [];
+    var selectLangTotalCount = 0;
+    
+    //Get selected language from dropdown
+    var language= document.getElementById("languages");
+    var languageVal = language.options[language.selectedIndex].value;
+    console.log(languageVal);
+
+    //Get select level from dropdown
+    var level = document.getElementById("level");
+    var levelVal = level.options[level.selectedIndex].value;
+    console.log(levelVal);
+
+    //Get selected year from dropdown
+    var year = document.getElementById("year");
+    var yearVal = year.options[year.selectedIndex].value;
+    console.log(yearVal);
+
+    var count = 0;
+    selectLangTotalCount = studentData.map(function(studentData)    {
+        if(studentData.HOME_LANGUAGE == languageVal 
+            && studentData.DATA_LEVEL == "PROVINCE LEVEL" 
+            && studentData.SCHOOL_YEAR == yearVal
+            && studentData.PUBLIC_OR_INDEPENDENT == "PROVINCE - Total")  {
+                count = studentData.NUMBER_OF_STUDENTS;
+            }
+            return count;
+    })
+    console.log(count);
+    
+    var selectRows = [];
+
+    select = studentData.map(function(studentData)   {
+        if(studentData.HOME_LANGUAGE == languageVal 
+            && studentData.DATA_LEVEL == levelVal 
+            && studentData.SCHOOL_YEAR == yearVal)  {
+                selectRows.push(studentData);
+            }
+                return studentData;
+    })
+    console.log(selectRows);
+
+    var total = 0;
+    for(i = 0; i < selectRows.length; i++)  {
+        if(selectRows[i].NUMBER_OF_STUDENTS != "Msk")   total += parseInt(selectRows[i].NUMBER_OF_STUDENTS);
+    }
+
+    console.log(total)
+
+    d3.json(topo_url).then(data => {
         console.log(data);
+
+        const collect = topojson.feature(data, data.objects.collection);
 
         const {height, width} = document.getElementById("map").getBoundingClientRect();
 
@@ -62,11 +131,11 @@ d3.csv("students.csv").then(studentData => {
                 [0, 0],
                 [width, height],
             ],
-            data
+            collect
         )
 
         // Source used to understand code for reversing polygons to draw reverse of polygons: https://stackoverflow.com/questions/54947126/geojson-map-with-d3-only-rendering-a-single-path-in-a-feature-collection
-        data.features.forEach(function(feature) {
+        collect.features.forEach(function(feature) {
             if(feature.geometry.type === "MultiPolygon") {
                 feature.geometry.coordinates.forEach(function(polygon) {
 
@@ -85,42 +154,45 @@ d3.csv("students.csv").then(studentData => {
         const path = d3.geoPath().projection(projection);
         svg.append("g")
             .selectAll("path")
-            .data(data.features)
+            .data(collect.features)
             .enter()
             .append("path")
-            .attr("district", (data) => data.properties.SCHOOL_DISTRICT_NAME)
+            .attr("class", (data) => data.properties.SCHOOL_DISTRICT_NAME)
             .attr("d", path)
             .attr("scale", "150")
-            .attr("fill", "#ba8deb")
-            .attr("stroke", "#3b007a")
-            .on("mouseover", handleMouseOver)
-            .on("mouseout", handleMouseOut);
+            .attr("fill", "orange")
+            .attr("opacity", (d, i) =>  {
+                let j = 0;
+                while(j < selectRows.length)    {
+                    if(d.properties.SCHOOL_DISTRICT_NAME == selectRows[j].DISTRICT_NAME) {
+                        d3.scaleLinear()
+                        .domain([0, d3.max(selectRows[j].NUMBER_OF_STUDENTS / count)])
+                        .range([0, 100]);
+                    }
+                    j++;
+                }
+            })
+            .attr("stroke", "black")
 
     });
 })
 
 /*
  const graticule = d3.geoGraticule();
-
 const proj = svg.append("projPath")
     .attr("width", "100%");
-
 const g = svg.append("g")
     .attr("width", "100%");
-
 //const pathG = g.append("pathG");
-
 d3.json("districts1.json").then(data => {
     console.log(data);
     console.log(data.features);
     //var bounds = path.bounds(data);
     //_data = data;
-
     proj.select()
         .enter()
         .append("proj")
         .merge(bc_projection);
-
     g.selectAll("path")
         .data(data.features)
         .enter()
@@ -135,10 +207,8 @@ d3.json("districts1.json").then(data => {
 })
         //.attr("stroke-width", "0.5");
         //.attr("fake", d => console.log(data.features.map((f) => f.properties.SCHOOL_DISTRICT_NAME)));
-
     /*
     var labels = g.selectAll(".label").data(data.features);
-
     labels.enter()
         .append("text")
         .attr("class", "label")
@@ -148,9 +218,6 @@ d3.json("districts1.json").then(data => {
     //.attr("stroke-width", 1.5);
 
 /*
-
-
-
         g.selectAll("path").data(data.features)
             .enter()
             .append("path")
@@ -159,15 +226,11 @@ d3.json("districts1.json").then(data => {
             .attr("fill", "white")
             .attr("stroke", "black")
             .attr("fake", d=> console.log(data.features.map((f) => f.properties.SCHOOL_DISTRICT_NAME)));
-
         //console.log(data.features.map((f) => f.properties.name))
-
         for(let i = 0; i < data.features.length; i++) {
             console.log(data.features.map((f) => f.properties.SCHOOL_DISTRICT_NAME));
         }
-
         const collect = topojson.feature(data, data.objects.collection);
-
 //        console.log(collect);
 //        const locate = collect.features;
         
@@ -207,7 +270,3 @@ d3.json("districts1.json").then(data => {
 // }
 
 // d3.json(topo_url, drawMap);
-
-
-        
-
