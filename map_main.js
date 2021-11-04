@@ -60,10 +60,21 @@ function selectLanguage()    {
     console.log(value);
 }
 
+// function languageCountOpacity(data, studentRows)    {
+//     let j = 0;
+//     let studentCount = 0;
+//     //console.log(studentRows[0].NUMBER_OF_STUDENTS)
+//     for(let i = 0; i < studentRows.length; i++) {
+//         //console.log(data.properties.SCHOOL_DISTRICT_NAME + " : " + studentRows[i].DISTRICT_NAME);
+//         if(data.properties.SCHOOL_DISTRICT_NAME == studentRows[j].DISTRICT_NAME) {
+//             //console.log(studentRows[j].DISTRICT_NAME);
+//             studentCount += parseInt(studentRows[j].NUMBER_OF_STUDENTS);
+//             //console.log(studentCount);
+//         }
+//     }
 
 
-
-d3.csv(student_url).then(studentData => {
+d3.csv("students.csv").then(studentData => {
     console.log(studentData);
 
     var select = [];
@@ -115,10 +126,10 @@ d3.csv(student_url).then(studentData => {
 
     console.log(total)
 
-    d3.json(topo_url).then(data => {
+    d3.json("districts1.json").then(data => {
         console.log(data);
 
-        const collect = topojson.feature(data, data.objects.collection);
+        //const collect = topojson.feature(data, data.objects.collection);
 
         const {height, width} = document.getElementById("map").getBoundingClientRect();
 
@@ -131,11 +142,11 @@ d3.csv(student_url).then(studentData => {
                 [0, 0],
                 [width, height],
             ],
-            collect
+            data
         )
 
         // Source used to understand code for reversing polygons to draw reverse of polygons: https://stackoverflow.com/questions/54947126/geojson-map-with-d3-only-rendering-a-single-path-in-a-feature-collection
-        collect.features.forEach(function(feature) {
+        data.features.forEach(function(feature) {
             if(feature.geometry.type === "MultiPolygon") {
                 feature.geometry.coordinates.forEach(function(polygon) {
 
@@ -151,28 +162,45 @@ d3.csv(student_url).then(studentData => {
             }
         })
 
+        var colorScale = d3.scaleLinear()
+            .domain([0, count])
+            .range([0, 1]);
+
         const path = d3.geoPath().projection(projection);
         svg.append("g")
             .selectAll("path")
-            .data(collect.features)
+            .data(data.features)
             .enter()
             .append("path")
             .attr("class", (data) => data.properties.SCHOOL_DISTRICT_NAME)
             .attr("d", path)
             .attr("scale", "150")
             .attr("fill", "orange")
-            .attr("opacity", (d, i) =>  {
-                let j = 0;
-                while(j < selectRows.length)    {
-                    if(d.properties.SCHOOL_DISTRICT_NAME == selectRows[j].DISTRICT_NAME) {
-                        d3.scaleLinear()
-                        .domain([0, d3.max(selectRows[j].NUMBER_OF_STUDENTS / count)])
-                        .range([0, 100]);
-                    }
-                    j++;
+            .attr("opacity", function(data) {
+                let studentCount = 0;
+                for(let i = 0; i < selectRows.length; i++) {
+                     //console.log(data.properties.SCHOOL_DISTRICT_NAME + " : " + selectRows[i].DISTRICT_NAME);
+                     if (data.properties.SCHOOL_DISTRICT_NAME == selectRows[i].DISTRICT_NAME) {
+                         //console.log(selectRows[i].DISTRICT_NAME);
+                         studentCount = studentCount + parseInt(selectRows[i].NUMBER_OF_STUDENTS);
+                         //console.log("students: " + selectRows[i].NUMBER_OF_STUDENTS);
+                         //console.log(studentCount);
+                     }
                 }
-            })
+                console.log(studentCount);
+                //return colorScale(studentCount);
+                let scale = studentCount / 100;
+                if (studentCount > 1) {
+                    return 1;
+                }
+                else {
+                    //console.log(data.properties.SCHOOL_DISTRICT_NAME + ": " + scale);
+                    return scale;
+                }
+             })
             .attr("stroke", "black")
+            .on("mouseover", handleMouseOver)
+            .on("mouseout", handleMouseOut);
 
     });
 })
