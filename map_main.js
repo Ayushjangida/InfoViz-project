@@ -14,18 +14,17 @@ const MARGIN = {
 const GRAPH_WIDTH = 8000 - MARGIN.LEFT - MARGIN.RIGHT;
 const GRAPH_HEIGHT = 8000 - MARGIN.TOP - MARGIN.BOTTOM;
 
-var div = d3.select("body")
+var form = d3.select("body").append("form");
+
+var div = d3.select("#tooltip")
     .append("div")
-    .attr("class", "tooltip")
+    //.attr("class", "tooltip")
     .style("opacity", 0);
 
 var mapDiv = d3.select("body")
                 .append("div")
-                .attr("widht", GRAPH_WIDTH)
+                .attr("width", GRAPH_WIDTH)
                 .attr("height", GRAPH_HEIGHT);
-
-var form = d3.select("body").append("form");
-
 
 var svg = mapDiv.append("svg")
     .attr("width", GRAPH_WIDTH)
@@ -40,15 +39,15 @@ function handleMouseOver(position) {
         .style("fill", "black");
     d3.select("div")
         .transition().duration(500)
-        .style("opacity", 0.9)
+        .style("opacity", 0) // needs to be 0.7
         .style("top", d3.event.pageY + 10)
         .style("left", d3.event.pageX + 10);
     div.html(this.getAttribute("district"));
-    console.log(this.getAttribute("district"));
-    console.log(d3.event.pageX, d3.event.pageY);
+    //console.log(this.getAttribute("district"));
+    //console.log(d3.event.pageX, d3.event.pageY);
 }
 function handleMouseOut() {
-    d3.select(this).style("fill", "#ba8deb");
+    d3.select(this).style("fill", "purple");
     d3.select("div")
         .transition().duration(500)
         .style("opacity", 0);
@@ -74,12 +73,112 @@ function selectLanguage()    {
 //     }
 
 
-d3.csv("students.csv").then(studentData => {
+d3.csv("students_clean.csv").then(studentData => {
     console.log(studentData);
 
     var select = [];
     var selectLangTotalCount = 0;
-    
+
+    /*
+    var schoolYears = [
+        '1991/1992',
+        '1992/1993',
+        '1993/1994',
+        '1994/1995',
+        '1995/1996',
+        '1996/1997',
+        '1997/1998',
+        '1998/1999',
+        '1999/2000',
+        '2000/2001',
+        '2001/2002',
+        '2002/2003',
+        '2003/2004',
+        '2005/2006',
+        '2006/2007',
+        '2007/2008',
+        '2008/2009',
+        '2009/2010',
+        '2010/2011',
+        '2011/2012',
+        '2012/2013',
+        '2013/2014',
+        '2014/2015',
+        '2015/2016',
+        '2016/2017',
+        '2017/2018',
+        '2018/2019',
+        '2019/2020',
+        '2020/2021'
+    ];
+
+    var dropdownButton = d3.select("#yearDropdown")
+        .append('select')
+
+    dropdownButton.selectAll('myOptions')
+        .data(schoolYears)
+        .enter()
+        .append('option')
+        .text(function(d) {return d; })
+        .attr("value", function(d) {return d});
+
+    dropdownButton.on("change", function(d) {
+        var selectedYear = d3.select(this).property("value");
+        updateYear(selectedYear);
+    })
+    function updateYear(myYear) {
+        mapDiv
+            .transition()
+            .duration(1000);
+        console.log("in update year function, updated year to: " + myYear);
+    }
+
+     */
+
+    // var languages = [
+    //     "English",
+    //     "Punjabi",
+    //     "Chinese",
+    //     "Hindi",
+    //     "Japanese",
+    //     "French"
+    // ], j = 1;
+    //
+    // //console.log(studentData[0].HOME_LANGUAGE);
+    // var uniqueLanguages = [];
+    // for(let i = 0; i < studentData.length; i++) {
+    //     if (studentData[i].HOME_LANGUAGE in uniqueLanguages) {
+    //         // do nothing
+    //         console.log("Language already there: " + studentData[i].HOME_LANGUAGE);
+    //     }
+    //     else {
+    //         uniqueLanguages.push(studentData[i].HOME_LANGUAGE)
+    //         console.log("New language: " + studentData[i].HOME_LANGUAGE + ", Adding...")
+    //     }
+    // }
+    //
+    // labels = form.selectAll("label")
+    //     .data(uniqueLanguages)
+    //     .enter()
+    //     .append("label")
+    //     .text(function(d) { return d; })
+    //     .append("input")
+    //     .attr("type", "radio")
+    //     .attr("Value", function(d) { return d;})
+    //     .text(function (d) {return d;} );
+    //         //class: "languageRadio",
+    //         //name: "mode",
+    //     //     value: function(d, i) {return i;}
+    //     // })
+    //     // .property("checked", function(d, i) {return i===j;});
+    //
+    // d3.selectAll("input")
+    //     .on("change", change);
+    //
+    // function change() {
+    //     console.log("new language selected " + this.value);
+    // }
+
     //Get selected language from dropdown
     var language= document.getElementById("languages");
     var languageVal = language.options[language.selectedIndex].value;
@@ -97,10 +196,10 @@ d3.csv("students.csv").then(studentData => {
 
     var count = 0;
     selectLangTotalCount = studentData.map(function(studentData)    {
-        if(studentData.HOME_LANGUAGE == languageVal 
-            && studentData.DATA_LEVEL == "PROVINCE LEVEL" 
-            && studentData.SCHOOL_YEAR == yearVal
-            && studentData.PUBLIC_OR_INDEPENDENT == "PROVINCE - Total")  {
+        if(studentData.HOME_LANGUAGE === languageVal
+            && studentData.DATA_LEVEL === "PROVINCE LEVEL"
+            && studentData.SCHOOL_YEAR === yearVal
+            && studentData.PUBLIC_OR_INDEPENDENT === "PROVINCE - Total")  {
                 count = studentData.NUMBER_OF_STUDENTS;
             }
             return count;
@@ -110,9 +209,9 @@ d3.csv("students.csv").then(studentData => {
     var selectRows = [];
 
     select = studentData.map(function(studentData)   {
-        if(studentData.HOME_LANGUAGE == languageVal 
-            && studentData.DATA_LEVEL == levelVal 
-            && studentData.SCHOOL_YEAR == yearVal)  {
+        if(studentData.HOME_LANGUAGE === languageVal
+            && studentData.DATA_LEVEL === levelVal
+            && studentData.SCHOOL_YEAR === yearVal)  {
                 selectRows.push(studentData);
             }
                 return studentData;
@@ -121,7 +220,7 @@ d3.csv("students.csv").then(studentData => {
 
     var total = 0;
     for(i = 0; i < selectRows.length; i++)  {
-        if(selectRows[i].NUMBER_OF_STUDENTS != "Msk")   total += parseInt(selectRows[i].NUMBER_OF_STUDENTS);
+        if(selectRows[i].NUMBER_OF_STUDENTS !== "Msk")   total += parseInt(selectRows[i].NUMBER_OF_STUDENTS);
     }
 
     console.log(total)
@@ -131,12 +230,14 @@ d3.csv("students.csv").then(studentData => {
 
         //const collect = topojson.feature(data, data.objects.collection);
 
+        // Map Projection
         const {height, width} = document.getElementById("map").getBoundingClientRect();
-
         const projection = d3.geoMercator()
-            .scale(5)
-            .center([0, 0])//13.439235,48.830666])//53.7267, 127.6476])
+            .center([15.454071, 4.279229])//13.439235,48.830666])//53.7267, 127.6476])
+            .scale(3000)
             .translate([GRAPH_WIDTH / 2, GRAPH_HEIGHT / 2]);
+
+
         projection.fitExtent(
             [
                 [0, 0],
@@ -145,7 +246,42 @@ d3.csv("students.csv").then(studentData => {
             data
         )
 
+        var path = d3.geoPath().projection(projection);
+
+        // // Slider for selecting year
+        // // https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
+        //
+        // var dataTime = d3.range(0, 20).map(function(d) {
+        //     return new Date(1991 + d, 10, 3);
+        // });
+        //
+        // var sliderTime = d3
+        //     .sliderBottom()
+        //     .min(d3.min(dataTime))
+        //     .max(d3.max(dataTime))
+        //     .step(1000 * 60 * 60 * 24 * 365)
+        //     .width(300)
+        //     .tickFormat(d3.timeFormat('%Y'))
+        //     .tickValues(dataTime)
+        //     .default(new Date(2000, 10, 3))
+        //     .on('onchange', val => {
+        //         d3.select('p#value-time').text(d3.timeFormat('%Y')(val));
+        //     });
+        //
+        // var gTime = d3.select('div#slider-time')
+        //     .append('svg')
+        //     .attr('width', 500)
+        //     .attr('height', 100)
+        //     .append('g')
+        //     .attr('transform', 'translate(30,30)');
+        //
+        // gTime.call(sliderTime);
+        //
+        // d3.select('p#value-time')
+        //     .text(d3.timeFormat('%Y')(sliderTime.value()));
+
         // Source used to understand code for reversing polygons to draw reverse of polygons: https://stackoverflow.com/questions/54947126/geojson-map-with-d3-only-rendering-a-single-path-in-a-feature-collection
+        // This was necessary to have districts drawn where they are independent pieces of the overall map
         data.features.forEach(function(feature) {
             if(feature.geometry.type === "MultiPolygon") {
                 feature.geometry.coordinates.forEach(function(polygon) {
@@ -162,47 +298,45 @@ d3.csv("students.csv").then(studentData => {
             }
         })
 
-        var colorScale = d3.scaleLinear()
-            .domain([0, count])
-            .range([0, 1]);
+        // Color scaling function for the opacity of the districts based on their language population
+        const colorScale = d3.scaleLinear()
+            .domain([0, 1000])
+            .range([0, 1])
 
-        const path = d3.geoPath().projection(projection);
-        svg.append("g")
+        // Drawing the districts
+        var finalMap = svg.append("g")
             .selectAll("path")
             .data(data.features)
             .enter()
             .append("path")
             .attr("class", (data) => data.properties.SCHOOL_DISTRICT_NAME)
             .attr("d", path)
-            .attr("scale", "150")
-            .attr("fill", "orange")
-            .attr("opacity", function(data) {
+            .attr("transform", "translate(-500, -4100) scale(2)")
+            //.attr("transform", "translate(30, 100)")
+            //.attr("scale", "150")
+            .attr("fill", "purple")
+            // Changing the fill opacity for each district based on the student population for the chosen language
+            .attr("fill-opacity", function(data) {
                 let studentCount = 0;
                 for(let i = 0; i < selectRows.length; i++) {
                      //console.log(data.properties.SCHOOL_DISTRICT_NAME + " : " + selectRows[i].DISTRICT_NAME);
-                     if (data.properties.SCHOOL_DISTRICT_NAME == selectRows[i].DISTRICT_NAME) {
+                     if (data.properties.SCHOOL_DISTRICT_NAME === selectRows[i].DISTRICT_NAME) {
                          //console.log(selectRows[i].DISTRICT_NAME);
                          studentCount = studentCount + parseInt(selectRows[i].NUMBER_OF_STUDENTS);
                          //console.log("students: " + selectRows[i].NUMBER_OF_STUDENTS);
                          //console.log(studentCount);
                      }
                 }
-                console.log(studentCount);
-                //return colorScale(studentCount);
-                let scale = studentCount / 100;
-                if (studentCount > 1) {
-                    return 1;
-                }
-                else {
-                    //console.log(data.properties.SCHOOL_DISTRICT_NAME + ": " + scale);
-                    return scale;
-                }
+                // console.log(data.properties.SCHOOL_DISTRICT_NAME + ": " + studentCount);
+                return colorScale(studentCount);
              })
             .attr("stroke", "black")
+            // Hover on and off functions for extra details
             .on("mouseover", handleMouseOver)
             .on("mouseout", handleMouseOut);
 
     });
+
 })
 
 /*

@@ -2,44 +2,59 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<meta name="description" content="">
+	<meta name="viewport" content="">
 	<title>Trial Maps - Adding maps using topojson</title>
     <script src="https://d3js.org/d3.v5.min.js"></script>
-    <script src="https:///d3js.org/topojson.v1.min.js"></script>
-
-
-
-    
+    <!-- <script src="https:///d3js.org/topojson.v1.min.js"></script>-->
 </head>
 <body class="body">
 
-	<div class="canva">
-    </div>
+	<h3 style="font-size: 6em; font-family: Arial"> BC Students Home Languages Overtime</h3>
+	<h4 style="font-size: 3em; font-family: Arial">Data collected from the BC Data Catalogue:
+		<a href="https://catalogue.data.gov.bc.ca/dataset/student-headcount-by-home-language/resource/942d798d-4c38-4705-b62e-e9d7bc8c15b4?inner_span=True">
+			Student Headcount by Home Language from 1991/92 - 2020/21</a>
+		and
+		<a href="https://catalogue.data.gov.bc.ca/dataset/school-districts-of-bc#edc-pow">
+			BC School Districts</a>
+	</h4>
+
+	<div id="yearDropdown"></div>
 	<div>
-		<label for="languages">Choose a language</label>
-		
-		<select name="languages" id="languages">
+		<label for="languages" style="font-size: 4em" >Choose a language</label>
+		<select name="languages" id="languages" style="font-size: 4em">
 			<option value="Punjabi">Punjabi</option>
 			<option value="Hindi">Hindi</option>
 			<option value="French">French</option>
 		</select>
 	</div>
-	<div>
-		<label for="level">Choose Level</label>
 
-		<select name="level" id="level">
+	<div>
+		<label for="level" style="font-size: 4em">Choose Level</label>
+		<select name="level" id="level" style="font-size: 4em">
 			<option value="DISTRICT LEVEL">District Level</option>
 			<option value="PROVINCE LEVEL">Province Level</option>
 		</select>
 	</div>
+
 	<div>
-		<label for="year">CHoose year</label>
-		
-		<select name="year" id="year">
+		<label for="year" style="font-size: 4em">Choose year</label>
+		<select name="year" id="year" style="font-size: 4em">
 			<option value="2000/2001">1991/92</option>
 			<option value="1992/1993">1992/93</option>
 			<option value="1993/1994">1993/94</option>
 		</select>
+	</div>
+
+	<div id="tooltip"> </div>
+
+<!--	<div class="row align-items-center">-->
+<!--		<div class="col-sm-2"><p id="value-time"></p></div>-->
+<!--		<div class="col-sm"><div id="slider-time"></div></div>-->
+<!--	</div>-->
+
+	<div id="timeSlider">
+		<label id="sliderYear"></label>
+		<input id="slider" type="range" min="1991" max="2020" step="1" value="0">
 	</div>
 
 
