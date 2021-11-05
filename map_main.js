@@ -14,23 +14,31 @@ const MARGIN = {
 const GRAPH_WIDTH = 8000 - MARGIN.LEFT - MARGIN.RIGHT;
 const GRAPH_HEIGHT = 8000 - MARGIN.TOP - MARGIN.BOTTOM;
 
+// For radio buttons
 var form = d3.select("body").append("form");
 
+var finalMap;
+
+// For tooltips
 var div = d3.select("#tooltip")
     .append("div")
     //.attr("class", "tooltip")
     .style("opacity", 0);
 
+// Map SVG
 var mapDiv = d3.select("body")
                 .append("div")
                 .attr("width", GRAPH_WIDTH)
                 .attr("height", GRAPH_HEIGHT);
 
+// Map
 var svg = mapDiv.append("svg")
     .attr("width", GRAPH_WIDTH)
     .attr("height", GRAPH_HEIGHT)
     .attr("id", "map");
 
+
+var selectedLanguage = "Punjabi";
 
 function handleMouseOver(position) {
     let pos = d3.mouse(this);
@@ -59,19 +67,37 @@ function selectLanguage()    {
     console.log(value);
 }
 
-// function languageCountOpacity(data, studentRows)    {
-//     let j = 0;
-//     let studentCount = 0;
-//     //console.log(studentRows[0].NUMBER_OF_STUDENTS)
-//     for(let i = 0; i < studentRows.length; i++) {
-//         //console.log(data.properties.SCHOOL_DISTRICT_NAME + " : " + studentRows[i].DISTRICT_NAME);
-//         if(data.properties.SCHOOL_DISTRICT_NAME == studentRows[j].DISTRICT_NAME) {
-//             //console.log(studentRows[j].DISTRICT_NAME);
-//             studentCount += parseInt(studentRows[j].NUMBER_OF_STUDENTS);
-//             //console.log(studentCount);
-//         }
-//     }
+var languages = [
+    "Punjabi",
+    "Chinese",
+    "Spanish",
+    "Japanese",
+    "French",
+    "English"
+];
 
+var dropdownButton = d3.select("#languageDropdown")
+    .append('select')
+
+dropdownButton.selectAll('myOptions')
+    .data(languages)
+    .enter()
+    .append('option')
+    .text(function(d) {return d; })
+    .attr("value", function(d) {return d});
+
+dropdownButton.on("change", function(d) {
+    selectedLanguage = d3.select(this).property("value");
+    finalMap.transition()
+        .attr("fill-opacity", 0);
+    drawMap();
+    console.log(selectedLanguage);
+})
+
+
+drawMap();
+
+function drawMap() {
 
 d3.csv("students_clean.csv").then(studentData => {
     console.log(studentData);
@@ -79,70 +105,6 @@ d3.csv("students_clean.csv").then(studentData => {
     var select = [];
     var selectLangTotalCount = 0;
 
-    /*
-    var schoolYears = [
-        '1991/1992',
-        '1992/1993',
-        '1993/1994',
-        '1994/1995',
-        '1995/1996',
-        '1996/1997',
-        '1997/1998',
-        '1998/1999',
-        '1999/2000',
-        '2000/2001',
-        '2001/2002',
-        '2002/2003',
-        '2003/2004',
-        '2005/2006',
-        '2006/2007',
-        '2007/2008',
-        '2008/2009',
-        '2009/2010',
-        '2010/2011',
-        '2011/2012',
-        '2012/2013',
-        '2013/2014',
-        '2014/2015',
-        '2015/2016',
-        '2016/2017',
-        '2017/2018',
-        '2018/2019',
-        '2019/2020',
-        '2020/2021'
-    ];
-
-    var dropdownButton = d3.select("#yearDropdown")
-        .append('select')
-
-    dropdownButton.selectAll('myOptions')
-        .data(schoolYears)
-        .enter()
-        .append('option')
-        .text(function(d) {return d; })
-        .attr("value", function(d) {return d});
-
-    dropdownButton.on("change", function(d) {
-        var selectedYear = d3.select(this).property("value");
-        updateYear(selectedYear);
-    })
-    function updateYear(myYear) {
-        mapDiv
-            .transition()
-            .duration(1000);
-        console.log("in update year function, updated year to: " + myYear);
-    }
-
-     */
-
-    // var languages = [
-    //     "English",
-    //     "Punjabi",
-    //     "Chinese",
-    //     "Hindi",
-    //     "Japanese",
-    //     "French"
-    // ], j = 1;
     //
     // //console.log(studentData[0].HOME_LANGUAGE);
     // var uniqueLanguages = [];
@@ -179,15 +141,6 @@ d3.csv("students_clean.csv").then(studentData => {
     //     console.log("new language selected " + this.value);
     // }
 
-    //Get selected language from dropdown
-    var language= document.getElementById("languages");
-    var languageVal = language.options[language.selectedIndex].value;
-    console.log(languageVal);
-
-    //Get select level from dropdown
-    var level = document.getElementById("level");
-    var levelVal = level.options[level.selectedIndex].value;
-    console.log(levelVal);
 
     //Get selected year from dropdown
     var year = document.getElementById("year");
@@ -196,7 +149,7 @@ d3.csv("students_clean.csv").then(studentData => {
 
     var count = 0;
     selectLangTotalCount = studentData.map(function(studentData)    {
-        if(studentData.HOME_LANGUAGE === languageVal
+        if(studentData.HOME_LANGUAGE === selectedLanguage
             && studentData.DATA_LEVEL === "PROVINCE LEVEL"
             && studentData.SCHOOL_YEAR === yearVal
             && studentData.PUBLIC_OR_INDEPENDENT === "PROVINCE - Total")  {
@@ -209,8 +162,8 @@ d3.csv("students_clean.csv").then(studentData => {
     var selectRows = [];
 
     select = studentData.map(function(studentData)   {
-        if(studentData.HOME_LANGUAGE === languageVal
-            && studentData.DATA_LEVEL === levelVal
+        if(studentData.HOME_LANGUAGE === selectedLanguage
+            && studentData.DATA_LEVEL === "DISTRICT LEVEL"
             && studentData.SCHOOL_YEAR === yearVal)  {
                 selectRows.push(studentData);
             }
@@ -300,44 +253,46 @@ d3.csv("students_clean.csv").then(studentData => {
 
         // Color scaling function for the opacity of the districts based on their language population
         const colorScale = d3.scaleLinear()
-            .domain([0, 1000])
+            .domain([0, 300])
             .range([0, 1])
 
-        // Drawing the districts
-        var finalMap = svg.append("g")
-            .selectAll("path")
-            .data(data.features)
-            .enter()
-            .append("path")
-            .attr("class", (data) => data.properties.SCHOOL_DISTRICT_NAME)
-            .attr("d", path)
-            .attr("transform", "translate(-500, -4100) scale(2)")
-            //.attr("transform", "translate(30, 100)")
-            //.attr("scale", "150")
-            .attr("fill", "purple")
-            // Changing the fill opacity for each district based on the student population for the chosen language
-            .attr("fill-opacity", function(data) {
-                let studentCount = 0;
-                for(let i = 0; i < selectRows.length; i++) {
-                     //console.log(data.properties.SCHOOL_DISTRICT_NAME + " : " + selectRows[i].DISTRICT_NAME);
-                     if (data.properties.SCHOOL_DISTRICT_NAME === selectRows[i].DISTRICT_NAME) {
-                         //console.log(selectRows[i].DISTRICT_NAME);
-                         studentCount = studentCount + parseInt(selectRows[i].NUMBER_OF_STUDENTS);
-                         //console.log("students: " + selectRows[i].NUMBER_OF_STUDENTS);
-                         //console.log(studentCount);
-                     }
-                }
-                // console.log(data.properties.SCHOOL_DISTRICT_NAME + ": " + studentCount);
-                return colorScale(studentCount);
-             })
-            .attr("stroke", "black")
-            // Hover on and off functions for extra details
-            .on("mouseover", handleMouseOver)
-            .on("mouseout", handleMouseOut);
+            // Drawing the districts
+        finalMap = svg.append("g")
+                .selectAll("path")
+                .data(data.features)
+                .enter()
+                .append("path")
+                .attr("class", (data) => data.properties.SCHOOL_DISTRICT_NAME)
+                .attr("d", path)
+                .attr("transform", "translate(-500, -4100) scale(2)")
+                //.attr("transform", "translate(30, 100)")
+                //.attr("scale", "150")
+                .attr("fill", "purple")
+                // Changing the fill opacity for each district based on the student population for the chosen language
+                .attr("fill-opacity", function (data) {
+                    let studentCount = 0;
+                    for (let i = 0; i < selectRows.length; i++) {
+                        //console.log(data.properties.SCHOOL_DISTRICT_NAME + " : " + selectRows[i].DISTRICT_NAME);
+                        if (data.properties.SCHOOL_DISTRICT_NAME === selectRows[i].DISTRICT_NAME) {
+                            //console.log(selectRows[i].DISTRICT_NAME);
+                            studentCount = studentCount + parseInt(selectRows[i].NUMBER_OF_STUDENTS);
+                            //console.log("students: " + selectRows[i].NUMBER_OF_STUDENTS);
+                            //console.log(studentCount);
+                        }
+                    }
+                    // console.log(data.properties.SCHOOL_DISTRICT_NAME + ": " + studentCount);
+                    return colorScale(studentCount);
+                })
+                .attr("stroke", "black")
+                // Hover on and off functions for extra details
+                .on("mouseover", handleMouseOver)
+                .on("mouseout", handleMouseOut);
+        })
 
     });
 
-})
+
+}
 
 /*
  const graticule = d3.geoGraticule();
