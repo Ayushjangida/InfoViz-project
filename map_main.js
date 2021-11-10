@@ -14,17 +14,12 @@ const MARGIN = {
 const GRAPH_WIDTH = 8000 - MARGIN.LEFT - MARGIN.RIGHT;
 const GRAPH_HEIGHT = 8000 - MARGIN.TOP - MARGIN.BOTTOM;
 
-// For radio buttons
-var form = d3.select("body").append("form");
-
+var fakeData = [1, 2, 5, 3];
 var finalMap;
-var yearVal = "1991/1992";
+var studentCount = 0;
 
-// For tooltips
-// var div = d3.select("#tooltip")
-//     .append("div")
-//     //.attr("class", "tooltip")
-//     .style("opacity", 0);
+var selectedLanguage = "Punjabi";
+var yearVal = "1991/1992";
 
 // Map SVG
 var mapDiv = d3.select("body")
@@ -38,29 +33,39 @@ var svg = mapDiv.append("svg")
     .attr("height", GRAPH_HEIGHT)
     .attr("id", "map");
 
+// Line Graph
+var linegraphsvg = d3.select("#linegraph")
+    .attr("width", 500)
+    .attr("height", 500)
+    .append("g")
+    .attr("transform", "translate(" + MARGIN.LEFT + "," + MARGIN.TOP + ")");
 
-var selectedLanguage = "Punjabi";
+// Tooltip
+var tooltip = d3.select("body")
+    .append("div")
+    .attr("id", "tooltip")
+    .attr("style", "position: absolute; opacity: 0");
 
-function handleMouseOver(position) {
-    let pos = d3.mouse(this);
-    console.log(pos);
-    d3.select(this)
-        .style("fill", "black");
-    d3.select("div")
-        .transition().duration(500)
-        .style("opacity", 0) // needs to be 0.7
-        .style("top", d3.event.pageY + 10)
-        .style("left", d3.event.pageX + 10);
-    div.html(this.getAttribute("district"));
-    //console.log(this.getAttribute("district"));
-    //console.log(d3.event.pageX, d3.event.pageY);
-}
-function handleMouseOut() {
-    d3.select(this).style("fill", "purple");
-    d3.select("div")
-        .transition().duration(500)
-        .style("opacity", 0);
-}
+// function handleMouseOver(position) {
+//     let pos = d3.mouse(this);
+//     console.log(pos);
+//     d3.select(this)
+//         .style("fill", "black");
+//     d3.select("div")
+//         .transition().duration(500)
+//         .style("opacity", 0) // needs to be 0.7
+//         .style("top", d3.event.pageY + 10)
+//         .style("left", d3.event.pageX + 10);
+//     div.html(this.getAttribute("district"));
+//     //console.log(this.getAttribute("district"));
+//     //console.log(d3.event.pageX, d3.event.pageY);
+// }
+// function handleMouseOut() {
+//     d3.select(this).style("fill", "purple");
+//     d3.select("div")
+//         .transition().duration(500)
+//         .style("opacity", 0);
+// }
 
 function selectLanguage()    {
     var select = document.getElementById("languages");
@@ -103,7 +108,11 @@ var dates = [
     2013,
     2014,
     2015,
-    2016
+    2016,
+    2017,
+    2018,
+    2019,
+    2020
 ];
 
 var dataTime = d3.range(0,26).map(function(d)   {
@@ -116,7 +125,7 @@ var sliderTimer = d3.sliderBottom()
     .min(d3.min(dates))
     .max(d3.max(dates))
     .step(1)
-    .width(300)
+    .width(700)
     .tickFormat(d3.format('1'))
     .ticks(10)
     .step(1)
@@ -135,10 +144,10 @@ var sliderTimer = d3.sliderBottom()
 
 var gTime = d3.select('div#timeSlider')
     .append('svg')
-    .attr('width', 500)
-    .attr('height', 100)
+    .attr('width', 4000)
+    .attr('height', 200)
     .append('g')
-    .attr('transform', 'translate(30,30)');
+    .attr('transform', 'translate(30,30) scale(3)');
 
 
 gTime.call(sliderTimer);
@@ -147,6 +156,8 @@ d3.select('p#value-time').text(d3.timeFormat('%Y')(sliderTimer.value()));
 
 var dropdownButton = d3.select("#languageDropdown")
     .append('select')
+    .style("width", "300px")
+    .style("height", "75px");
 
 
 dropdownButton.selectAll('myOptions')
@@ -154,8 +165,10 @@ dropdownButton.selectAll('myOptions')
     .enter()
     .append('option')
     .text(function(d) {return d; })
-    .attr("value", function(d) {return d})
-    .attr("font-size", "15px");
+    .style("width", "300px")
+    .style("height", "55px")
+    .style("font-size", "20px")
+    .attr("value", function(d) {return d});
 
 dropdownButton.on("change", function(d) {
     selectedLanguage = d3.select(this).property("value");
@@ -165,12 +178,11 @@ dropdownButton.on("change", function(d) {
     console.log(selectedLanguage);
 })
 
-
 drawMap();
 
 function drawMap() {
 
-d3.csv("students_clean.csv").then(studentData => {
+d3.csv("students.csv").then(studentData => {
     //console.log(studentData);
 
     var select = [];
@@ -266,7 +278,7 @@ d3.csv("students_clean.csv").then(studentData => {
                 .append("path")
                 .attr("class", (data) => data.properties.SCHOOL_DISTRICT_NAME)
                 .attr("d", path)
-                .attr("transform", "translate(-500, -4100) scale(2)")
+                .attr("transform", "translate(-1700, -5700) scale(2.5)")
                 //.attr("transform", "translate(30, 100)")
                 //.attr("scale", "150")
                 .attr("fill", "purple")
@@ -279,7 +291,6 @@ d3.csv("students_clean.csv").then(studentData => {
                             //console.log(selectRows[i].DISTRICT_NAME);
                             studentCount = studentCount + parseInt(selectRows[i].NUMBER_OF_STUDENTS);
                             //console.log("students: " + selectRows[i].NUMBER_OF_STUDENTS);
-                            //console.log(studentCount);
                         }
                     }
                     // console.log(data.properties.SCHOOL_DISTRICT_NAME + ": " + studentCount);
@@ -287,8 +298,64 @@ d3.csv("students_clean.csv").then(studentData => {
                 })
                 .attr("stroke", "black")
                 // Hover on and off functions for extra details
-                .on("mouseover", handleMouseOver)
-                .on("mouseout", handleMouseOut);
+                .on("mouseover", function(d) {
+                    d3.select(this)
+                        .style("fill", "black");
+                    d3.select("#tooltip")
+                        .transition()
+                        .duration(200)
+                        .style("background", "white")
+                        .style("font-size", "40px")
+                        .style('opacity', 1)
+                        .text(d.properties.SCHOOL_DISTRICT_NAME);
+
+        })
+                .on("mousemove", function(d) {
+                    d3.select("#tooltip")
+                        .style('left', (d3.event.pageX+10) + 'px')
+                        .style('top', (d3.event.pageY+10) + 'px');
+                })
+                .on("mouseout", function(d) {
+                    d3.select(this)
+                        .style("fill", "purple");
+                    d3.select("#tooltip")
+                        .transition()
+                        .duration(200)
+                        .style('opacity', 0);
+                })
+                .on("click", function(d) {
+                    let languageTrend = [];
+                    let year = "1991/1992";
+                    let count = 0;
+                    //console.log(studentData);
+                    for(let i = 0 ; i < studentData.length; i++) {
+                        if (year !== studentData[i].SCHOOL_YEAR) {
+                            year = studentData[i].SCHOOL_YEAR;
+                            //console.log(studentData[i].SCHOOL_YEAR);
+                            //languageTrend.push(count);
+                            //count = 0;
+                        }
+                        //console.log(studentData[i].DATA_LEVEL);
+
+                        if(year === studentData[i].SCHOOL_YEAR) {
+                            console.log("year match")
+                            if (studentData[i].DATA_LEVEL === "DISTRICT LEVEL") {
+                                console.log("district")
+                                if (studentData[i].SCHOOL_DISTRICT_NAME === d.properties.SCHOOL_DISTRICT_NAME) {
+                                    console.log("name")
+                                    if (selectedLanguage === studentData[i].HOME_LANGUAGE) {
+                                        console.log("language")
+                                        //count = count + studentData[i].NUMBER_OF_STUDENTS;
+                                        languageTrend.push(studentData[i].NUMBER_OF_STUDENTS);
+                                        console.log(studentData[i].NUMBER_OF_STUDENTS);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    console.log(languageTrend);
+
+                });
         })
 
     });
