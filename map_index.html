@@ -3,8 +3,9 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="">
-	<title>Trial Maps - Adding maps using topojson</title>
+	<title>CSC 511 - BC Students Home Languages</title>
     <script src="https://d3js.org/d3.v5.min.js"></script>
+	<script src="https://unpkg.com/d3-simple-slider"></script>
     <!-- <script src="https:///d3js.org/topojson.v1.min.js"></script>-->
 </head>
 <body class="body">
@@ -19,42 +20,14 @@
 	</h4>
 
 	<div id="languageDropdown"></div>
-	<div>
-		<label for="languages" style="font-size: 4em" >Choose a language</label>
-		<select name="languages" id="languages" style="font-size: 4em">
-			<option value="Spanish">Punjabi</option>
-			<option value="Hindi">Hindi</option>
-			<option value="French">French</option>
-		</select>
-	</div>
-
-	<div>
-		<label for="level" style="font-size: 4em">Choose Level</label>
-		<select name="level" id="level" style="font-size: 4em">
-			<option value="DISTRICT LEVEL">District Level</option>
-			<option value="PROVINCE LEVEL">Province Level</option>
-		</select>
-	</div>
-
-	<div>
-		<label for="year" style="font-size: 4em">Choose year</label>
-		<select name="year" id="year" style="font-size: 4em">
-			<option value="2020/2021">1991/92</option>
-			<option value="1992/1993">1992/93</option>
-			<option value="1993/1994">1993/94</option>
-		</select>
-	</div>
 
 	<div id="tooltip"> </div>
 
-<!--	<div class="row align-items-center">-->
-<!--		<div class="col-sm-2"><p id="value-time"></p></div>-->
-<!--		<div class="col-sm"><div id="slider-time"></div></div>-->
-<!--	</div>-->
 
 	<div id="timeSlider">
-		<label id="sliderYear"></label>
-		<input id="slider" type="range" min="1991" max="2020" step="1" value="0">
+<!--		<label id="sliderYear"></label>-->
+<!--		<input id="slider" type="range" min="1991" max="2020" step="1" value="0">-->
+<!--		<div class="col-sm-2"><p id="value-time"></p></div>-->
 	</div>
 
 

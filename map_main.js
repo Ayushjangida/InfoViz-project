@@ -18,12 +18,13 @@ const GRAPH_HEIGHT = 8000 - MARGIN.TOP - MARGIN.BOTTOM;
 var form = d3.select("body").append("form");
 
 var finalMap;
+var yearVal = "1991/1992";
 
 // For tooltips
-var div = d3.select("#tooltip")
-    .append("div")
-    //.attr("class", "tooltip")
-    .style("opacity", 0);
+// var div = d3.select("#tooltip")
+//     .append("div")
+//     //.attr("class", "tooltip")
+//     .style("opacity", 0);
 
 // Map SVG
 var mapDiv = d3.select("body")
@@ -76,15 +77,85 @@ var languages = [
     "English"
 ];
 
+var dates = [
+    1991,
+    1992,
+    1993,
+    1994,
+    1995,
+    1996,
+    1997,
+    1998,
+    1999,
+    2000,
+    2001,
+    2002,
+    2003,
+    2004,
+    2005,
+    2006,
+    2007,
+    2008,
+    2009,
+    2010,
+    2011,
+    2012,
+    2013,
+    2014,
+    2015,
+    2016
+];
+
+var dataTime = d3.range(0,26).map(function(d)   {
+    return new Date(1991 + d, 10, 3);
+});
+
+// Slider for selecting year
+// https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
+var sliderTimer = d3.sliderBottom()
+    .min(d3.min(dates))
+    .max(d3.max(dates))
+    .step(1)
+    .width(300)
+    .tickFormat(d3.format('1'))
+    .ticks(10)
+    .step(1)
+    .default(d3.min(dates))
+    .on('onchange', val => {
+        let num1 = val.toString();
+        let num2 = (val + 1).toString();
+        d3.select('p#value-time').text(d3.timeFormat('%Y')(val));
+        yearVal = num1 + "/" + num2;
+        console.log(yearVal);
+        finalMap.transition()
+            .attr("fill-opacity", 0);
+        drawMap();
+    });
+
+
+var gTime = d3.select('div#timeSlider')
+    .append('svg')
+    .attr('width', 500)
+    .attr('height', 100)
+    .append('g')
+    .attr('transform', 'translate(30,30)');
+
+
+gTime.call(sliderTimer);
+
+d3.select('p#value-time').text(d3.timeFormat('%Y')(sliderTimer.value()));
+
 var dropdownButton = d3.select("#languageDropdown")
     .append('select')
+
 
 dropdownButton.selectAll('myOptions')
     .data(languages)
     .enter()
     .append('option')
     .text(function(d) {return d; })
-    .attr("value", function(d) {return d});
+    .attr("value", function(d) {return d})
+    .attr("font-size", "15px");
 
 dropdownButton.on("change", function(d) {
     selectedLanguage = d3.select(this).property("value");
@@ -100,52 +171,15 @@ drawMap();
 function drawMap() {
 
 d3.csv("students_clean.csv").then(studentData => {
-    console.log(studentData);
+    //console.log(studentData);
 
     var select = [];
     var selectLangTotalCount = 0;
 
-    //
-    // //console.log(studentData[0].HOME_LANGUAGE);
-    // var uniqueLanguages = [];
-    // for(let i = 0; i < studentData.length; i++) {
-    //     if (studentData[i].HOME_LANGUAGE in uniqueLanguages) {
-    //         // do nothing
-    //         console.log("Language already there: " + studentData[i].HOME_LANGUAGE);
-    //     }
-    //     else {
-    //         uniqueLanguages.push(studentData[i].HOME_LANGUAGE)
-    //         console.log("New language: " + studentData[i].HOME_LANGUAGE + ", Adding...")
-    //     }
-    // }
-    //
-    // labels = form.selectAll("label")
-    //     .data(uniqueLanguages)
-    //     .enter()
-    //     .append("label")
-    //     .text(function(d) { return d; })
-    //     .append("input")
-    //     .attr("type", "radio")
-    //     .attr("Value", function(d) { return d;})
-    //     .text(function (d) {return d;} );
-    //         //class: "languageRadio",
-    //         //name: "mode",
-    //     //     value: function(d, i) {return i;}
-    //     // })
-    //     // .property("checked", function(d, i) {return i===j;});
-    //
-    // d3.selectAll("input")
-    //     .on("change", change);
-    //
-    // function change() {
-    //     console.log("new language selected " + this.value);
-    // }
-
-
     //Get selected year from dropdown
     var year = document.getElementById("year");
-    var yearVal = year.options[year.selectedIndex].value;
-    console.log(yearVal);
+    //var yearVal = year.options[year.selectedIndex].value;
+    //console.log(yearVal);
 
     var count = 0;
     selectLangTotalCount = studentData.map(function(studentData)    {
@@ -157,7 +191,7 @@ d3.csv("students_clean.csv").then(studentData => {
             }
             return count;
     })
-    console.log(count);
+    //console.log(count);
     
     var selectRows = [];
 
@@ -169,17 +203,17 @@ d3.csv("students_clean.csv").then(studentData => {
             }
                 return studentData;
     })
-    console.log(selectRows);
+    //console.log(selectRows);
 
     var total = 0;
     for(i = 0; i < selectRows.length; i++)  {
         if(selectRows[i].NUMBER_OF_STUDENTS !== "Msk")   total += parseInt(selectRows[i].NUMBER_OF_STUDENTS);
     }
 
-    console.log(total)
+    //console.log(total)
 
     d3.json("districts1.json").then(data => {
-        console.log(data);
+        //console.log(data);
 
         //const collect = topojson.feature(data, data.objects.collection);
 
@@ -200,38 +234,6 @@ d3.csv("students_clean.csv").then(studentData => {
         )
 
         var path = d3.geoPath().projection(projection);
-
-        // // Slider for selecting year
-        // // https://bl.ocks.org/johnwalley/e1d256b81e51da68f7feb632a53c3518
-        //
-        // var dataTime = d3.range(0, 20).map(function(d) {
-        //     return new Date(1991 + d, 10, 3);
-        // });
-        //
-        // var sliderTime = d3
-        //     .sliderBottom()
-        //     .min(d3.min(dataTime))
-        //     .max(d3.max(dataTime))
-        //     .step(1000 * 60 * 60 * 24 * 365)
-        //     .width(300)
-        //     .tickFormat(d3.timeFormat('%Y'))
-        //     .tickValues(dataTime)
-        //     .default(new Date(2000, 10, 3))
-        //     .on('onchange', val => {
-        //         d3.select('p#value-time').text(d3.timeFormat('%Y')(val));
-        //     });
-        //
-        // var gTime = d3.select('div#slider-time')
-        //     .append('svg')
-        //     .attr('width', 500)
-        //     .attr('height', 100)
-        //     .append('g')
-        //     .attr('transform', 'translate(30,30)');
-        //
-        // gTime.call(sliderTime);
-        //
-        // d3.select('p#value-time')
-        //     .text(d3.timeFormat('%Y')(sliderTime.value()));
 
         // Source used to understand code for reversing polygons to draw reverse of polygons: https://stackoverflow.com/questions/54947126/geojson-map-with-d3-only-rendering-a-single-path-in-a-feature-collection
         // This was necessary to have districts drawn where they are independent pieces of the overall map
