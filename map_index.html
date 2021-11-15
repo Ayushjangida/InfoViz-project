@@ -19,20 +19,51 @@
 			BC School Districts</a>
 	</h4>
 
-	<div id="languageDropdown"></div>
+	<div>
+		<select name="languages" id="languages" onchange="newLanguage(this.value)" style="width: 300px; height: 100px; font-family: Arial; font-size: 30px; margin-top: 50px; margin-left: 30px; z-index: 8; position: absolute">
+			<option value="English" style="font-family: Arial; font-size: 30px">English</option>
+			<option value="Chinese" style="font-family: Arial; font-size: 30px" selected>Chinese</option>
+			<option value="Punjabi" style="font-family: Arial; font-size: 30px">Punjabi</option>
+			<option value="Tagalog (Philipino)" style="font-family: Arial; font-size: 30px">Tagalog (Philipino)</option>
+			<option value="Spanish" style="font-family: Arial; font-size: 30px" >Spanish</option>
+			<option value="Japanese" style="font-family: Arial; font-size: 30px">Japanese</option>
+			<option value="Polish" style="font-family: Arial; font-size: 30px">Polish</option>
+			<option value="Italian" style="font-family: Arial; font-size: 30px" >Italian</option>
+			<option value="Portuguese" style="font-family: Arial; font-size: 30px">Portuguese}</option>
+			<option value="French" style="font-family: Arial; font-size: 30px">French</option>
+			<option value="Vietnamese" style="font-family: Arial; font-size: 30px" >Vietnamese</option>
+			<option value="Hindi" style="font-family: Arial; font-size: 30px">Hindi</option>
+			<option value="Korean" style="font-family: Arial; font-size: 30px">Korean</option>
+			<option value="Other Germanic" style="font-family: Arial; font-size: 30px" >Other Germanic</option>
+			<option value="Oneida" style="font-family: Arial; font-size: 30px">Oneida</option>
+			<option value="Czechoslovakian" style="font-family: Arial; font-size: 30px">Czechoslovakian</option>
+			<option value="Cambodian" style="font-family: Arial; font-size: 30px">Cambodian</option>
+			<option value="Russian" style="font-family: Arial; font-size: 30px" >Russian</option>
+			<option value="Hungarian" style="font-family: Arial; font-size: 30px">Hungarian</option>
+			<option value="Czech" style="font-family: Arial; font-size: 30px">Czech</option>
+			<option value="German" style="font-family: Arial; font-size: 30px" >German</option>
+			<option value="Finnish" style="font-family: Arial; font-size: 30px">Finnish</option>
+			<option value="Greek" style="font-family: Arial; font-size: 30px">Greek</option>
+			<option value="Laotian" style="font-family: Arial; font-size: 30px" >Laotian</option>
+			<option value="Persian" style="font-family: Arial; font-size: 30px">Persian</option>
+			<option value="Romanche" style="font-family: Arial; font-size: 30px">Romanche</option>
+			<option value="Tsilhqot'ln" style="font-family: Arial; font-size: 30px" >Tsilhgot'ln</option>
+			<option value="Carrier" style="font-family: Arial; font-size: 30px">Carrier</option>
+			<option value="Yugoslavian" style="font-family: Arial; font-size: 30px" >Yugoslavian</option>
+			<option value="Dutch" style="font-family: Arial; font-size: 30px">Dutch</option>
+		</select>
+	</div>
+
+<!--	<div id="languageDropdown" style="margin-top: 50px; margin-left: 30px; z-index: 8; position: absolute"></div>-->
 	<div id="linegraph"></div>
+	<div id="timeSlider" style="margin-top: 1350px; margin-left: 30px; z-index: 9; position: absolute"></div>
+	<div id="mainmap" style="position: absolute"></div>
 
 <!--	<g class="tooltip-area">-->
 <!--		<rect style="fill: red; width: 500px; height: 500px">-->
 <!--			<text class="tooltip-area__text">aas</text>-->
 <!--		</rect>-->
 <!--	</g>-->
-
-	<div id="timeSlider">
-<!--		<label id="sliderYear"></label>-->
-<!--		<input id="slider" type="range" min="1991" max="2020" step="1" value="0">-->
-<!--		<div class="col-sm-2"><p id="value-time"></p></div>-->
-	</div>
 
 
 </body>

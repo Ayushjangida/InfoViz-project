@@ -22,7 +22,7 @@ var selectedLanguage = "Punjabi";
 var yearVal = "1991/1992";
 
 // Map SVG
-var mapDiv = d3.select("body")
+var mapDiv = d3.select("#mainmap")
                 .append("div")
                 .attr("width", GRAPH_WIDTH)
                 .attr("height", GRAPH_HEIGHT);
@@ -73,14 +73,14 @@ function selectLanguage()    {
     console.log(value);
 }
 
-var languages = [
-    "Punjabi",
-    "Chinese",
-    "Spanish",
-    "Japanese",
-    "French",
-    "English"
-];
+// var languages = [
+//     "Punjabi",
+//     "Chinese",
+//     "Spanish",
+//     "Japanese",
+//     "French",
+//     "English"
+// ];
 
 var dates = [
     1991,
@@ -115,7 +115,7 @@ var dates = [
     2020
 ];
 
-var dataTime = d3.range(0,26).map(function(d)   {
+var dataTime = d3.range(0,30).map(function(d)   {
     return new Date(1991 + d, 10, 3);
 });
 
@@ -178,6 +178,13 @@ dropdownButton.on("change", function(d) {
     console.log(selectedLanguage);
 })
 
+function newLanguage(newlanguage) {
+    selectedLanguage = newlanguage;
+    finalMap.transition()
+         .attr("fill-opacity", 0);
+    drawMap();
+    console.log(selectedLanguage);
+}
 drawMap();
 
 function drawMap() {
@@ -192,6 +199,12 @@ d3.csv("students.csv").then(studentData => {
     var year = document.getElementById("year");
     //var yearVal = year.options[year.selectedIndex].value;
     //console.log(yearVal);
+
+    //Get selected language from dropdown
+    var language= document.getElementById("languages");
+    var languageVal = language.options[language.selectedIndex].value;
+    console.log(languageVal);
+    selectedLanguage = languageVal;
 
     var count = 0;
     selectLangTotalCount = studentData.map(function(studentData)    {
@@ -278,7 +291,7 @@ d3.csv("students.csv").then(studentData => {
                 .append("path")
                 .attr("class", (data) => data.properties.SCHOOL_DISTRICT_NAME)
                 .attr("d", path)
-                .attr("transform", "translate(-1700, -5700) scale(2.5)")
+                .attr("transform", "translate(-2100, -6400) scale(2.8)")
                 //.attr("transform", "translate(30, 100)")
                 //.attr("scale", "150")
                 .attr("fill", "purple")
@@ -303,7 +316,7 @@ d3.csv("students.csv").then(studentData => {
                         .style("fill", "black");
                     d3.select("#tooltip")
                         .transition()
-                        .duration(200)
+                        .duration(50)
                         .style("background", "white")
                         .style("font-size", "40px")
                         .style('opacity', 1)
@@ -320,7 +333,7 @@ d3.csv("students.csv").then(studentData => {
                         .style("fill", "purple");
                     d3.select("#tooltip")
                         .transition()
-                        .duration(200)
+                        .duration(50)
                         .style('opacity', 0);
                 })
                 .on("click", function(d) {
