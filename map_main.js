@@ -16,7 +16,7 @@ const GRAPH_HEIGHT = 8000 - MARGIN.TOP - MARGIN.BOTTOM;
 
 var fakeData = [1, 2, 5, 3];
 var finalMap;
-var studentCount = 0;
+var globalStudentCount = 0;
 
 var selectedLanguage = "Punjabi";
 var yearVal = "1991/1992";
@@ -185,6 +185,150 @@ function newLanguage(newlanguage) {
     drawMap();
     console.log(selectedLanguage);
 }
+
+// Legend scale: https://www.visualcinnamon.com/2016/05/smooth-color-legend-d3-svg-gradient/
+//Append a defs (for definition) element to your SVG
+var defs = svg.append("defs");
+
+//Append a linearGradient element to the defs and give it a unique id
+var linearGradient = defs.append("linearGradient")
+    .attr("id", "linear-gradient");
+
+linearGradient
+    .attr("x1", "0%")
+    .attr("y1", "0%")
+    .attr("x2", "100%")
+    .attr("y2", "0%");
+
+//Set the color for the start (0%)
+linearGradient.append("stop")
+    .attr("offset", "0%")
+    .attr("stop-color", "white"); //light blue
+
+//Set the color for the end (100%)
+linearGradient.append("stop")
+    .attr("offset", "100%")
+    .attr("stop-color", "#053464"); //dark blue
+
+var gradientTitle = svg.append("text")
+    .attr("y", 1400)
+    .attr("x", 350)
+    .attr("font-size", "40px")
+    .attr("font-color", "black")
+    //.style("text-anchor", "left")
+    .text("Student Population");
+
+var gradient = svg.append("rect")
+    .attr("width", 300)
+    .attr("height", 20)
+    .style("fill", "url(#linear-gradient)")
+    .style("transform", "scale(5)")
+    .attr("y", 290)
+    .attr("x", 70);
+
+// var formatAxis = d3.format(".1");
+// var axis = d3.axisBottom()
+//     .tickFormat(formatAxis)
+//     .ticks(10)
+//     .tickValues([100, 200, 300, 400, 500, 600, 700, 800, 900]); //specify an array here for values
+//     //.orient("bottom");
+
+var gradient0 = svg.append("text")
+    .attr("y", 1580)
+    .attr("x", 350)
+    .attr("font-size", "20px")
+    .attr("font-color", "black")
+    //.style("text-anchor", "end")
+    .text("0");
+
+var gradient100 = svg.append("text")
+    .attr("y", 1580)
+    .attr("x", 500)
+    .attr("font-size", "20px")
+    .attr("font-color", "black")
+    //.style("text-anchor", "end")
+    .text("100");
+
+var gradient200 = svg.append("text")
+    .attr("y", 1580)
+    .attr("x", 650)
+    .attr("font-size", "20px")
+    .attr("font-color", "black")
+    //.style("text-anchor", "end")
+    .text("200");
+
+var gradient300 = svg.append("text")
+    .attr("y", 1580)
+    .attr("x", 800)
+    .attr("font-size", "20px")
+    .attr("font-color", "black")
+    //.style("text-anchor", "end")
+    .text("300");
+
+var gradient400 = svg.append("text")
+    .attr("y", 1580)
+    .attr("x", 950)
+    .attr("font-size", "20px")
+    .attr("font-color", "black")
+    //.style("text-anchor", "end")
+    .text("400");
+
+var gradient500 = svg.append("text")
+    .attr("y", 1580)
+    .attr("x", 1100)
+    .attr("font-size", "20px")
+    .attr("font-color", "black")
+    //.style("text-anchor", "end")
+    .text("500");
+
+var gradient600 = svg.append("text")
+    .attr("y", 1580)
+    .attr("x", 1250)
+    .attr("font-size", "20px")
+    .attr("font-color", "black")
+    //.style("text-anchor", "end")
+    .text("600");
+
+var gradient700 = svg.append("text")
+    .attr("y", 1580)
+    .attr("x", 1400)
+    .attr("font-size", "20px")
+    .attr("font-color", "black")
+    //.style("text-anchor", "end")
+    .text("700");
+
+var gradient800 = svg.append("text")
+    .attr("y", 1580)
+    .attr("x", 1550)
+    .attr("font-size", "20px")
+    .attr("font-color", "black")
+    //.style("text-anchor", "end")
+    .text("800");
+
+var gradient900 = svg.append("text")
+    .attr("y", 1580)
+    .attr("x", 1700)
+    .attr("font-size", "20px")
+    .attr("font-color", "black")
+    //.style("text-anchor", "end")
+    .text("900");
+
+var gradient1000 = svg.append("text")
+    .attr("y", 1580)
+    .attr("x", 1850)
+    .attr("font-size", "20px")
+    .attr("font-color", "black")
+    //.style("text-anchor", "end")
+    .text("1000");
+
+//
+// gradient.append("text")
+//     .attr("x", 60)
+//     .attr("y", 280)
+//     .attr("font-size", "40px")
+//     //.style("text-anchor", "left")
+//     .text("Student Population");
+
 drawMap();
 
 function drawMap() {
@@ -294,7 +438,7 @@ d3.csv("students.csv").then(studentData => {
                 .attr("transform", "translate(-2100, -6400) scale(2.8)")
                 //.attr("transform", "translate(30, 100)")
                 //.attr("scale", "150")
-                .attr("fill", "purple")
+                .attr("fill", "#053464")
                 // Changing the fill opacity for each district based on the student population for the chosen language
                 .attr("fill-opacity", function (data) {
                     let studentCount = 0;
@@ -317,7 +461,7 @@ d3.csv("students.csv").then(studentData => {
                     d3.select("#tooltip")
                         .transition()
                         .duration(50)
-                        .style("background", "white")
+                        .style("background", "#e4b54c")
                         .style("font-size", "40px")
                         .style('opacity', 1)
                         .text(d.properties.SCHOOL_DISTRICT_NAME);
@@ -330,7 +474,7 @@ d3.csv("students.csv").then(studentData => {
                 })
                 .on("mouseout", function(d) {
                     d3.select(this)
-                        .style("fill", "purple");
+                        .style("fill", "#053464");
                     d3.select("#tooltip")
                         .transition()
                         .duration(50)
