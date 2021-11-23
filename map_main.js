@@ -514,12 +514,12 @@ d3.csv(student_url).then(studentData => {
 
                     var titleDiv = d3.select("body").append("div").attr("id", "line_graph_title");
                     titleDiv.append("p")
-                            .text("District: Thompson-Kamploops")
+                            .text("District: Sea of Sky")
                             .attr("font-size", "24px");
                             
                     var div = d3.select("body").append("div").attr("id", "line_graph");
                     div.append("img")
-                        .attr("src", "japanese_student.png")
+                        .attr("src", "sea_of_sky.png")
                         .attr("alt", "line graph")
                         .attr("width", 1000)
                         .attr("height", 800)
