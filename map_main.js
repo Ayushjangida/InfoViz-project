@@ -333,7 +333,7 @@ drawMap();
 
 function drawMap() {
 
-d3.csv("students.csv").then(studentData => {
+d3.csv(student_url).then(studentData => {
     //console.log(studentData);
 
     var select = [];
@@ -381,10 +381,10 @@ d3.csv("students.csv").then(studentData => {
 
     //console.log(total)
 
-    d3.json("districts1.json").then(data => {
+    d3.json(topo_url).then(data => {
         //console.log(data);
 
-        //const collect = topojson.feature(data, data.objects.collection);
+        const collect = topojson.feature(data, data.objects.collection);
 
         // Map Projection
         const {height, width} = document.getElementById("map").getBoundingClientRect();
@@ -399,14 +399,14 @@ d3.csv("students.csv").then(studentData => {
                 [0, 0],
                 [width, height],
             ],
-            data
+            collect
         )
 
         var path = d3.geoPath().projection(projection);
 
         // Source used to understand code for reversing polygons to draw reverse of polygons: https://stackoverflow.com/questions/54947126/geojson-map-with-d3-only-rendering-a-single-path-in-a-feature-collection
         // This was necessary to have districts drawn where they are independent pieces of the overall map
-        data.features.forEach(function(feature) {
+        collect.features.forEach(function(feature) {
             if(feature.geometry.type === "MultiPolygon") {
                 feature.geometry.coordinates.forEach(function(polygon) {
 
@@ -430,21 +430,21 @@ d3.csv("students.csv").then(studentData => {
             // Drawing the districts
         finalMap = svg.append("g")
                 .selectAll("path")
-                .data(data.features)
+                .data(collect.features)
                 .enter()
                 .append("path")
-                .attr("class", (data) => data.properties.SCHOOL_DISTRICT_NAME)
+                .attr("class", (collect) => collect.properties.SCHOOL_DISTRICT_NAME)
                 .attr("d", path)
                 .attr("transform", "translate(-2100, -6400) scale(2.8)")
                 //.attr("transform", "translate(30, 100)")
                 //.attr("scale", "150")
                 .attr("fill", "#053464")
                 // Changing the fill opacity for each district based on the student population for the chosen language
-                .attr("fill-opacity", function (data) {
+                .attr("fill-opacity", function (collect) {
                     let studentCount = 0;
                     for (let i = 0; i < selectRows.length; i++) {
                         //console.log(data.properties.SCHOOL_DISTRICT_NAME + " : " + selectRows[i].DISTRICT_NAME);
-                        if (data.properties.SCHOOL_DISTRICT_NAME === selectRows[i].DISTRICT_NAME) {
+                        if (collect.properties.SCHOOL_DISTRICT_NAME === selectRows[i].DISTRICT_NAME) {
                             //console.log(selectRows[i].DISTRICT_NAME);
                             studentCount = studentCount + parseInt(selectRows[i].NUMBER_OF_STUDENTS);
                             //console.log("students: " + selectRows[i].NUMBER_OF_STUDENTS);
@@ -511,6 +511,19 @@ d3.csv("students.csv").then(studentData => {
                         }
                     }
                     console.log(languageTrend);
+
+                    var titleDiv = d3.select("body").append("div").attr("id", "line_graph_title");
+                    titleDiv.append("p")
+                            .text("District: Thompson-Kamploops")
+                            .attr("font-size", "24px");
+                            
+                    var div = d3.select("body").append("div").attr("id", "line_graph");
+                    div.append("img")
+                        .attr("src", "japanese_student.png")
+                        .attr("alt", "line graph")
+                        .attr("width", 1000)
+                        .attr("height", 800)
+                        .attr("transform", "tranlate(1000,0)");
 
                 });
         })
